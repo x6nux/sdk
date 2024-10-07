@@ -88,6 +88,16 @@ func (a *Auth) UpdateRecord(id string, r Record) (model.UpdateRecordSetResponse,
 		RecordsetId: id,
 	}
 	request.Body = r.updateRecord()
+	name := r.Name
+	if !strings.HasSuffix(name, a.Domain) {
+		// name 必须以域名结尾
+		//判断当前name是否使用 . 作为结尾
+		if name[len(name)-1:] != "." {
+			name += "."
+		}
+		name += a.Domain
+	}
+	request.Body.Name = &name
 	response, err := client.UpdateRecordSet(request)
 	if err != nil {
 		return model.UpdateRecordSetResponse{}, err
